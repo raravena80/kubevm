@@ -1,14 +1,12 @@
 # KubeVM [![Build Status](https://travis-ci.org/raravena80/kubevm.svg?branch=master)](https://travis-ci.org/raravena80/kubevm) [![Apache Licensed](https://img.shields.io/badge/license-Apache2.0-blue.svg)](https://raw.githubusercontent.com/raravena80/kubevm/master/LICENSE)
 
-Simple KUBE environment manager, usage inspired by wayneeseguin/rvm
-
-Also modified from a fork of chefvm trobrock/chefvm
+Simple KUBE environment manager.
 
 ## Installation
 
     # KubeVM will create a symlink between (~/.kubevm -> ~/.kube ), make sure you have no ~/.kube directory before installing
     mv ~/.kube ~/.kube.bak
-    git clone git://github.com/trobrock/kubevm.git ~/.kubevm
+    git clone git://github.com/raravena80/kubevm.git ~/.kubevm
     ~/.kubevm/bin/kubevm init # Follow these instructions
     
 After following these instructions reload your terminal, then
