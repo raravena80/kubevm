@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Usage: kubevm use CONFIG
+# Summary: Switch to the specified configuration
+# Help: This command will set your environment to use the specified kube configuration
+
+set -e
+
+__kubevm_config $1
+
+# Provide kubevm completions
+if [ "$1" = "--complete" ]; then
+  exec ls $_KUBEVM_ROOT/$configurations
+fi
+
+if [[ "$1" == "default" ]] && [ ! -d "$_KUBEVM_ROOT/$config_path" ]; then
+  echo "No default config set"
+  exit 1
+elif [ ! -d "$_KUBEVM_ROOT/$config_path" ]; then
+  echo "No configuration with that name was found"
+  exit 2
+fi
+
+rm -f $current_path
+ln -s $config_path $current_path
+
+echo "Using kube config \"$config\""

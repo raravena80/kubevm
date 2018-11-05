@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Usage: kubevm list
+# Summary: List all the available kubevm configurations
+# Help: This command will show you all your available knife kube configurations
+
+set -e
+
+__kubevm_config
+
+default_config=$(readlink $default_path) || true
+for c in $(ls $_KUBEVM_ROOT/$configurations)
+do
+  opts="  "
+  if [[ "$c" == "$config" && "$c" == "$default_config" ]]; then
+    opts="*="
+  elif [[ "$c" == "$config" ]]; then
+    opts="=>"
+  elif [[ "$c" == "$default_config" ]]; then
+    opts="* "
+  fi
+
+  [[ "$c" != "default" ]] && echo "$opts $c"
+done
+
+echo
+echo "=> - current"
+echo "*= - current and default"
+echo "*  - default"

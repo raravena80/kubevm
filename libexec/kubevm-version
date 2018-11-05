@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Usage: kubevm version
+# Summary: Show the current versin of kubevm
+# Help: This command will show the currently installed version of kubevm
+
+set -e
+
+echo $_KUBEVM_VERSION

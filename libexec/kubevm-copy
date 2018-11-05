@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Usage: kubevm copy CONFIG NEW_CONFIG
+# Summary: This will copy one kube configuration to a new name
+# Help: This command allows you to clone one configuration to a new name
+
+set -e
+
+__kubevm_config $1
+
+if [ -z "$config" ]; then
+  echo "No name provided"
+  exit 1
+fi
+
+if [ ! -d $_KUBEVM_ROOT/$config_path ]; then
+  echo "No configuration named $1 found."
+  kubevm list
+  exit 1
+fi
+
+if [ -z "$2" ]; then
+  echo "No destination name provided"
+  exit 1
+fi
+
+echo "Copying: $config to $2" 
+cp -R $_KUBEVM_ROOT/$config_path $_KUBEVM_ROOT/$configurations/$2

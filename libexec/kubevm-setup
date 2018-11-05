@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Usage: kubevm setup
+# Summary: Setup symlinks and put you in a config
+# Help: This command is for initial environment load
+
+set -e
+
+__kubevm_config
+[[ ! -e "$HOME/.kube" && ! -L "$HOME/.kube" ]] && ln -s $current_path $HOME/.kube
+
+if [[ ! -e "$current_path" ]]; then
+  echo "[kubevm] Creating an example kube config and setting it to default"
+  kubevm create example > /dev/null
+  kubevm default example > /dev/null
+fi
+
+config=$(readlink $current_path | sed "s/$configurations\///")
+[[ -z "$config" ]] && kubevm use default > /dev/null

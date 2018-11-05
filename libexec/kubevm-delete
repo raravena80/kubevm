@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Usage: kubevm delete CONFIG
+# Summary: Delete a config from kubevm
+# Help: This command will delete a configuration from kubevm, this cannot be undone.
+
+set -e
+
+if [ -z "$1" ]; then
+  echo "No name provided"
+  exit 1
+fi
+
+__kubevm_config $1
+
+default_config=$(readlink $default_path) || true
+if [[ "$default_config" == "$config" ]]; then
+  rm $default_path
+fi
+
+current_config=$(readlink $current_path | sed "s/$configurations\///")
+if [[ "$current_config" == "$config" ]]; then
+  rm $current_path
+fi
+
+rm -rf $_KUBEVM_ROOT/$config_path
+
+echo "Removed $config"

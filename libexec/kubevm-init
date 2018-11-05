@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+set -e
+
+print=""
+if [ "$1" = "-" ]; then
+  print=1
+  shift
+fi
+shell="$1"
+if [ -z "$shell" ]; then
+  shell="$(ps c -p "$PPID" -o 'ucomm=' 2>/dev/null || true)"
+  shell="${shell##-}"
+  shell="${shell%% *}"
+  shell="$(basename "${shell:-$SHELL}")"
+fi
+
+resolve_link() {
+  $(type -p greadlink readlink | head -1) $1
+}
+
+abs_dirname() {
+  local cwd="$(pwd)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+root="$(abs_dirname "$0")/.."
+
+if [ -z "$print" ]; then
+  case "$shell" in
+  bash )
+    profile='~/.bash_profile'
+    ;;
+  zsh )
+    profile='~/.zshenv'
+    ;;
+  * )
+    profile='your profile'
+    ;;
+  esac
+
+  { echo "# Load kubevm automatically by adding"
+    echo "# the following to ${profile}:"
+    echo
+    echo "eval \"\$(${_KUBEVM_ROOT}/bin/kubevm init -)\""
+    echo
+  } >&2
+
+  exit 1
+fi
+
+bin_path="${_KUBEVM_ROOT}/bin"
+case "$shell" in
+fish )
+  echo "eval 'set -x PATH \$PATH \"$bin_path\"';"
+  ;;
+* )
+  echo "export PATH=\"\$PATH:$bin_path\""
+  ;;
+esac
+
+case "$shell" in
+bash | zsh )
+  echo "source \"$root/completions/kubevm.${shell}\""
+  ;;
+esac
+
+commands=(`kubevm commands --sh`)
+IFS="|"
+case "$shell" in
+fish )
+  cat <<EOS
+  eval '
+function kubevm
+  set command "\$1"
+  if test [ "\$argv" -gt 0 ]
+    shift
+  end
+
+  switch "\$command"
+    case ${commands[*]}
+      eval \`kubevm "sh-\$command" "\$argv"\`
+    case '*'
+      command kubevm "\$command" "\$argv"
+  end
+end';
+eval 'kubevm setup';
+EOS
+  ;;
+* )
+  cat <<EOS
+kubevm() {
+  local command="\$1"
+  if [ "\$#" -gt 0 ]; then
+    shift
+  fi
+
+  case "\$command" in
+  ${commands[*]})
+    eval \`kubevm "sh-\$command" "\$@"\`;;
+  *)
+    command kubevm "\$command" "\$@";;
+  esac
+}
+kubevm setup
+EOS
+  ;;
+esac

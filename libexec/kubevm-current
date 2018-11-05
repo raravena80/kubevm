@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Usage: kubevm current
+# Summary: Shows the current config
+
+set -e
+
+__kubevm_config $1
+
+echo $config

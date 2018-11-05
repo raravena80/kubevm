@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Usage: kubevm update
+# Summary: This will update kubevm to the latest using git
+# Help: This command makes it easy to update kubevm to the latest version from trobrock/kubevm@master
+
+set -e
+
+__kubevm_config $1
+
+cd $_KUBEVM_ROOT
+git fetch --tags origin
+tag="$( git describe --tags --abbrev=0 `git rev-list --tags --max-count=1` )"
+diff="$( git cherry -v HEAD $tag | wc -l )"
+
+if [ "$diff" -eq 0 ]; then
+  echo "Already up to date."
+else
+  git reset --hard $tag
+  echo "Updated to $tag!"
+fi
