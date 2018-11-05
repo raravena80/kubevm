@@ -2,6 +2,8 @@
 
 Simple KUBE environment manager.
 
+It allows you to manage multiple Kubernetes config files each with multiple clusters and contexts
+
 ## Installation
 
     # KubeVM will create a symlink between (~/.kubevm -> ~/.kube ), make sure you have no ~/.kube directory before installing
